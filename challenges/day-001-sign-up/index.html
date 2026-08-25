@@ -3,25 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Day 001 - Sign Up</title>
+  <title>Day 001 - Clash-Inspired Clan Signup</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="signup-shell">
-    <section class="panel" aria-labelledby="signup-title">
-      <div class="badge">Daily UI · Day 001</div>
-      <h1 id="signup-title">Sign Up Flow</h1>
+  <main class="clan-shell">
+    <section class="hero" aria-labelledby="clan-title">
+      <p class="eyebrow">Day 001 · Daily UI</p>
+      <h1 id="clan-title">Clash of Clans-Inspired Signup</h1>
       <p>
-        Design a sign up page, modal, form, or app screen related to signing up
-        for something. This is a responsive and keyboard-friendly sign up screen.
+        Recruiters need a clear onboarding lane. This interface models a fantasy-clan
+        signup flow with accessible validation, instant feedback, and responsive layout.
       </p>
+      <div class="banner" role="img" aria-label="Stylized war shield and torch"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="signup-title">
+      <p class="panel-tag">War Room Registration</p>
+      <h2 id="signup-title">Build your clan profile</h2>
+      <p class="muted">Fill the form to join a battle-ready guild, then continue to your dashboard.</p>
 
       <form id="signupForm" novalidate>
-        <label for="name">Full name</label>
-        <input id="name" name="name" type="text" autocomplete="name" required placeholder="Alex Rivera" />
+        <label for="clanName">Clan name</label>
+        <input
+          id="clanName"
+          name="clanName"
+          type="text"
+          maxlength="24"
+          autocomplete="organization"
+          required
+          placeholder="Night Brigade"
+          aria-describedby="clanNameHelp"
+        />
+        <p id="clanNameHelp" class="help">Use 3–24 characters. Example: <span>Fireforge</span>.</p>
 
-        <label for="email">Email address</label>
-        <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+        <label for="clanTag">Clan tag</label>
+        <input
+          id="clanTag"
+          name="clanTag"
+          type="text"
+          maxlength="6"
+          autocomplete="off"
+          placeholder="NFG"
+          aria-describedby="clanTagHelp"
+          required
+        />
+        <p id="clanTagHelp" class="help">Auto-formats to uppercase letters/numbers, no spaces.</p>
+
+        <label for="commander">Commander name</label>
+        <input
+          id="commander"
+          name="commander"
+          type="text"
+          autocomplete="name"
+          required
+          placeholder="Commander Arin"
+          aria-describedby="commanderHelp"
+        />
+        <p id="commanderHelp" class="help">Name shown on leaderboard.</p>
+
+        <label for="email">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          placeholder="you@example.com"
+          aria-describedby="emailHelp"
+        />
+        <p id="emailHelp" class="help">We only send one verification email.</p>
 
         <label for="password">Password</label>
         <div class="password-row">
@@ -32,47 +83,87 @@
             minlength="8"
             autocomplete="new-password"
             required
-            placeholder="at least 8 characters"
+            aria-describedby="passwordHelp"
           />
           <button type="button" id="togglePassword" aria-controls="password" aria-pressed="false">
             Show
           </button>
         </div>
+        <p id="passwordHelp" class="help">Minimum 8 characters with one number and one letter.</p>
 
-        <div class="progress" role="progressbar" aria-label="Password strength" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="strength" role="progressbar" aria-label="Password strength" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <span id="strengthBar"></span>
         </div>
 
-        <button type="submit" class="primary">Create account</button>
+        <label class="terms">
+          <input id="terms" type="checkbox" required />
+          <span>I agree to the clan rules and data terms.</span>
+        </label>
+
+        <button type="submit" class="primary">Join the clan</button>
       </form>
 
-      <div id="signupStatus" class="status" role="status" aria-live="polite"></div>
+      <output id="signupStatus" role="status" aria-live="polite"></output>
+    </section>
+
+    <section class="preview" aria-live="polite" aria-label="Clan tag preview">
+      <h2>Live badge preview</h2>
+      <p class="tag-preview" id="tagPreview">TAG: </p>
+      <p class="tag-preview" id="clanPreview">Clan: </p>
     </section>
   </main>
 
   <script>
     const form = document.getElementById('signupForm');
     const status = document.getElementById('signupStatus');
-    const password = document.getElementById('password');
+    const email = document.getElementById('email');
     const toggle = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
     const strengthBar = document.getElementById('strengthBar');
-    const strengthWrap = document.querySelector('[role="progressbar"]');
+    const strengthWrap = document.querySelector('.strength[role="progressbar"]');
+    const clanTag = document.getElementById('clanTag');
+    const clanName = document.getElementById('clanName');
+    const commander = document.getElementById('commander');
+    const tagPreview = document.getElementById('tagPreview');
+    const clanPreview = document.getElementById('clanPreview');
+
+    function formatTag(value) {
+      return value
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+        .slice(0, 6);
+    }
 
     function scorePassword(value) {
       let score = 0;
       if (value.length >= 8) score += 30;
       if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score += 25;
-      if (/\d/.test(value)) score += 20;
-      if (/[^A-Za-z0-9]/.test(value)) score += 25;
+      if (/\d/.test(value)) score += 25;
+      if (/[^A-Za-z0-9]/.test(value)) score += 20;
       return Math.min(score, 100);
     }
 
-    password.addEventListener('input', () => {
+    function validateEmail(value) {
+      return /.+@.+\..+/.test(value.trim());
+    }
+
+    function validatePassword(value) {
+      return value.length >= 8 && /[a-zA-Z]/.test(value) && /\d/.test(value);
+    }
+
+    function refreshStrength() {
       const strength = scorePassword(password.value);
       strengthBar.style.width = `${strength}%`;
       strengthWrap.setAttribute('aria-valuenow', String(strength));
-      strengthBar.style.background = strength < 35 ? '#ffb4a9' : strength < 65 ? '#ffd166' : '#9be15d';
-    });
+      strengthBar.style.background = strength < 35 ? '#f6b39a' : strength < 65 ? '#f3d57a' : '#7ee3a7';
+    }
+
+    function refreshPreview() {
+      const normalizedTag = formatTag(clanTag.value);
+      clanTag.value = normalizedTag;
+      tagPreview.textContent = `TAG: ${normalizedTag || 'N/A'}`;
+      clanPreview.textContent = `Clan: ${clanName.value.trim() || 'Untitled war camp'}`;
+    }
 
     toggle.addEventListener('click', () => {
       const shown = password.type === 'text';
@@ -81,25 +172,35 @@
       toggle.setAttribute('aria-pressed', String(!shown));
     });
 
+    clanTag.addEventListener('input', refreshPreview);
+    clanName.addEventListener('input', refreshPreview);
+    password.addEventListener('input', refreshStrength);
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const name = document.getElementById('name').value.trim();
-      const pwd = password.value;
+      status.className = '';
 
-      const validEmail = /.+@.+\..+/.test(email);
-      if (!name || !validEmail || pwd.length < 8) {
+      if (!clanName.value.trim() || !commander.value.trim() || !validateEmail(email.value) || !validatePassword(password.value) || !clanTag.value.trim() || !document.getElementById('terms').checked) {
         status.className = 'status error';
-        status.textContent = 'Please complete the form: name, valid email, and password (8+ chars).';
+        status.textContent = 'Complete all required fields and review the requirements before joining.';
+        return;
+      }
+
+      if (form.reportValidity() === false) {
+        status.className = 'status error';
+        status.textContent = 'One or more entries are not valid. Please correct the marked fields.';
         return;
       }
 
       status.className = 'status success';
-      status.textContent = `Welcome, ${name}. Registration demo validated successfully.`;
+      status.textContent = `Welcome, ${commander.value.trim()}! Your clan ${clanName.value.trim()} is now queued for review.`;
       form.reset();
-      strengthBar.style.width = '0%';
-      strengthWrap.setAttribute('aria-valuenow', '0');
+      refreshStrength();
+      refreshPreview();
     });
+
+    refreshStrength();
+    refreshPreview();
   </script>
 </body>
 </html>

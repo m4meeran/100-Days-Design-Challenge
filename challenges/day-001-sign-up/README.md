@@ -1,12 +1,14 @@
-# Day 001 - Sign Up
+# Day 001 - Clash-Inspired Clan Signup
 
 - **Prompt:** `Prompt: Sign Up - Create a sign up page, modal, form, or app screen related to signing up for something.`
+- **Reviewer Remark:** `That something should be Clash of Clan Game Sign up`
+- **Implementation focus:** Reworked the signup flow into a Clash of Clans-themed guild registration experience using only custom CSS imagery and no official assets.
 - **Design decisions:**
-  - Built a lightweight, accessible account creation flow with labeled fields.
-  - Added password visibility toggle and progress-driven strength indicator.
-  - Included real-time validation and a polite live status update region.
-  - Kept layout card-based and responsive for mobile and desktop with high contrast text.
+  - Replaced the generic form with a two-panel game-clan onboarding layout.
+  - Added clan tag auto-formatting and a live badge preview for immediate feedback.
+  - Added stronger inline validation for commander name, tag, email, password, and terms agreement.
+  - Kept all visuals custom (no protected or copied assets), with keyboard-focus styles and ARIA-live status updates.
 - **Verification:**
-  - Opened page locally and validated required fields, password toggle, and form validation behavior.
-  - Confirmed layout stays readable at 360px and 1280px widths.
-  - Ran project checks (tests and syntax) after change.
+  - Verified form behavior via browser validation and custom submit handling paths.
+  - Confirmed layout remains usable at desktop and mobile breakpoints (`max-width: 900px`, `max-width: 520px`).
+  - Ran project tests: `.venv/bin/python -m pytest`.
