@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 005 - App Icon</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="icon-studio">
+    <h1>App Icon Studio</h1>
+    <p>Design an app icon concept with adjustable styling controls.</p>
+
+    <section class="controls" aria-label="Icon controls">
+      <label for="bgColor">Background</label>
+      <input type="color" id="bgColor" name="bgColor" value="#5c58f1" />
+
+      <label for="accent">Accent</label>
+      <input type="color" id="accent" name="accent" value="#f7f7ff" />
+
+      <label for="shape">Shape size</label>
+      <input type="range" id="shape" name="shape" min="32" max="70" value="54" />
+    </section>
+
+    <section class="canvas" aria-label="Icon preview" aria-live="polite">
+      <div id="icon" role="img" aria-label="Generated app icon preview">
+        <span class="dot"></span>
+        <span class="dot half"></span>
+      </div>
+    </section>
+
+    <button id="download" type="button">Export spec snapshot</button>
+    <p id="icon-notice" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const bg = document.getElementById('bgColor');
+    const accent = document.getElementById('accent');
+    const shape = document.getElementById('shape');
+    const icon = document.getElementById('icon');
+    const notice = document.getElementById('icon-notice');
+
+    function apply() {
+      icon.style.background = bg.value;
+      icon.style.setProperty('--accent', accent.value);
+      icon.style.setProperty('--shape', `${shape.value}px`);
+      icon.querySelector('.dot').style.left = `${10 + (100 - shape.value) / 20}px`;
+      icon.querySelector('.dot.half').style.left = `${45 - (100 - shape.value) / 25}px`;
+    }
+
+    for (const input of [bg, accent, shape]) {
+      input.addEventListener('input', apply);
+    }
+
+    document.getElementById('download').addEventListener('click', () => {
+      notice.textContent = 'Icon parameters captured for export to design tool (mock token generated in UI): ' + JSON.stringify({
+        background: bg.value,
+        accent: accent.value,
+        shape: shape.value,
+      });
+    });
+
+    apply();
+  </script>
+</body>
+</html>
