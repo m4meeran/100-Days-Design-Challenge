@@ -1,0 +1,60 @@
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #f4f5fa;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background: var(--bg);
+  color: #1a2141;
+}
+
+.shop-shell {
+  width: min(960px, 100%);
+  margin: auto;
+  padding: 1rem;
+}
+
+header { margin-bottom: 1rem; }
+
+.toolbar {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+select, button { font: inherit; }
+
+select {
+  padding: 0.45rem;
+  border: 1px solid #cfd8f0;
+  border-radius: 8px;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  background: #4450d9;
+  color: white;
+  padding: 0.45rem 0.75rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.8rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #d9e2f7;
+  border-radius: 12px;
+  padding: 0.8rem;
+}
+
+.card .name { margin: 0; }
+.card .price { color: #2d6f6b; font-weight: 700; }
+
+.card .add { margin-top: 0.4rem; }

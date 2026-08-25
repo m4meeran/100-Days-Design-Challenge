@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 012 - E-commerce Shop</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shop-shell">
+    <header>
+      <h1>Daily Goods Store</h1>
+      <p>Quickly browse and add essentials.</p>
+      <p id="cart" aria-live="polite">Cart: 0 items</p>
+    </header>
+
+    <section class="toolbar" aria-label="Catalog controls">
+      <select id="category" name="category" aria-label="Filter category">
+        <option value="all">All</option>
+        <option value="home">Home</option>
+        <option value="beauty">Beauty</option>
+      </select>
+      <button type="button" id="sort">Sort by cheapest</button>
+    </section>
+
+    <section id="products" class="grid" aria-label="Product catalog"></section>
+  </main>
+
+  <template id="card-template">
+    <article class="card">
+      <h2 class="name"></h2>
+      <p class="category"></p>
+      <p class="price"></p>
+      <button type="button" class="add">Add</button>
+    </article>
+  </template>
+
+  <script>
+    const data = [
+      { name: 'Candlemaker Soap', category: 'beauty', price: 14 },
+      { name: 'Desk Lamp', category: 'home', price: 27 },
+      { name: 'Journaling Set', category: 'home', price: 18 },
+      { name: 'Aloe Facial Mist', category: 'beauty', price: 21 },
+    ];
+
+    const grid = document.getElementById('products');
+    const cartText = document.getElementById('cart');
+    const category = document.getElementById('category');
+    const sortBtn = document.getElementById('sort');
+    const template = document.getElementById('card-template');
+    let cartCount = 0;
+
+    let view = [...data];
+
+    function render(items) {
+      grid.innerHTML = '';
+      for (const item of items) {
+        const card = template.content.firstElementChild.cloneNode(true);
+        card.querySelector('.name').textContent = item.name;
+        card.querySelector('.category').textContent = item.category;
+        card.querySelector('.price').textContent = `$${item.price.toFixed(2)}`;
+        card.querySelector('.add').addEventListener('click', () => {
+          cartCount += 1;
+          cartText.textContent = `Cart: ${cartCount} items`;
+          card.querySelector('.add').textContent = 'Added';
+        });
+        grid.append(card);
+      }
+    }
+
+    function applyFilters() {
+      const selected = category.value;
+      const filtered = selected === 'all' ? data : data.filter((i) => i.category === selected);
+      render(filtered);
+    }
+
+    sortBtn.addEventListener('click', () => {
+      view = [...view].sort((a, b) => a.price - b.price);
+      render(view);
+    });
+
+    category.addEventListener('change', applyFilters);
+    render(data);
+  </script>
+</body>
+</html>
