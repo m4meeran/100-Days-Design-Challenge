@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 004 - Calculation</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="calc-shell">
+    <section class="calc" aria-labelledby="calc-title">
+      <h1 id="calc-title">Calculation Element</h1>
+      <p>Standard calculator with accessible button labels and clear display history.</p>
+
+      <output id="display" role="status" aria-live="polite">0</output>
+      <div id="history" class="history" aria-live="off"></div>
+
+      <div class="buttons" role="group" aria-label="Calculator keys">
+        <button type="button" data-action="clear">C</button>
+        <button type="button" data-action="toggle-sign">±</button>
+        <button type="button" data-action="backspace">⌫</button>
+        <button type="button" data-op="/">÷</button>
+
+        <button type="button" data-number="7">7</button>
+        <button type="button" data-number="8">8</button>
+        <button type="button" data-number="9">9</button>
+        <button type="button" data-op="*">×</button>
+
+        <button type="button" data-number="4">4</button>
+        <button type="button" data-number="5">5</button>
+        <button type="button" data-number="6">6</button>
+        <button type="button" data-op="-">−</button>
+
+        <button type="button" data-number="1">1</button>
+        <button type="button" data-number="2">2</button>
+        <button type="button" data-number="3">3</button>
+        <button type="button" data-op="+">+</button>
+
+        <button type="button" class="zero" data-number="0">0</button>
+        <button type="button" data-number=".">.</button>
+        <button type="button" data-action="equals" class="equals">=</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const display = document.getElementById('display');
+    const history = document.getElementById('history');
+    const buttons = document.querySelector('.buttons');
+    let current = '0';
+
+    function render() {
+      display.textContent = current;
+    }
+
+    function appendToken(value) {
+      if (current === '0' && value !== '.') {
+        current = value;
+      } else {
+        if (value === '.' && current.includes('.')) {
+          return;
+        }
+        current += value;
+      }
+      render();
+    }
+
+    buttons.addEventListener('click', (event) => {
+      const btn = event.target.closest('button');
+      if (!btn) return;
+      if (btn.dataset.number !== undefined) {
+        appendToken(btn.dataset.number);
+        return;
+      }
+      if (btn.dataset.op) {
+        current += ` ${btn.dataset.op} `;
+        render();
+        return;
+      }
+      switch (btn.dataset.action) {
+        case 'clear':
+          current = '0';
+          history.textContent = '';
+          render();
+          break;
+        case 'backspace':
+          if (current.length <= 1) {
+            current = '0';
+          } else {
+            current = current.slice(0, -1);
+          }
+          render();
+          break;
+        case 'toggle-sign':
+          if (current.startsWith('-')) {
+            current = current.slice(1);
+          } else {
+            current = '-' + current;
+          }
+          render();
+          break;
+        case 'equals':
+          try {
+            // evaluate only with safe operators and numbers
+            const expression = current.replace(/×/g, '*').replace(/÷/g, '/');
+            const result = Function(`"use strict"; return (${expression})`)();
+            history.textContent = `${current} =`;
+            current = String(Number.isFinite(result) ? result : '0');
+          } catch {
+            current = 'Error';
+          }
+          render();
+          break;
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
