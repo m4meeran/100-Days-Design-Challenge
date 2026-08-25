@@ -1,0 +1,10 @@
+[project]
+name = "daily-ui-automation"
+version = "0.1.0"
+description = "Gmail-to-design Daily UI automation with Drive and Sheets review"
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

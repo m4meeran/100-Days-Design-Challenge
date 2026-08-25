@@ -1,0 +1,16 @@
+# Google OAuth secrets
+credentials.json
+client_secret_*.json
+token.json
+
+# Local runtime state
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+state.json
+*.log
+.DS_Store
+
+# Temporary bundles
+.build/

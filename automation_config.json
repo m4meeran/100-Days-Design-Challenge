@@ -1,0 +1,9 @@
+{
+  "gmail_query": "{from:(dailyui.co) subject:\"Daily UI\"}",
+  "spreadsheet_name": "100 Days Design Challenge - Review Board",
+  "drive_folder_name": "100 Days Design Challenge",
+  "review_tab": "Challenges",
+  "github_repository": "https://github.com/m4meeran/100-Days-Design-Challenge",
+  "timezone": "Asia/Kolkata",
+  "schedule": "0 13 * * 1-5"
+}
