@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 002 - Credit Card Checkout</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="checkout-shell">
+    <section class="checkout-panel" aria-labelledby="checkout-title">
+      <h1 id="checkout-title">Card Checkout</h1>
+      <p>Secure, touch-friendly layout for entering card details and validating amounts.</p>
+
+      <form id="checkout-form" novalidate>
+        <fieldset>
+          <legend>Payment details</legend>
+
+          <label for="card">Card number</label>
+          <input id="card" name="card" inputmode="numeric" autocomplete="cc-number" maxlength="19" placeholder="4111 1111 1111 1111" required />
+
+          <label for="name">Cardholder</label>
+          <input id="name" name="name" autocomplete="cc-name" required placeholder="Jane Doe" />
+
+          <div class="inline-group">
+            <div>
+              <label for="expiry">Expiry</label>
+              <input id="expiry" name="expiry" autocomplete="cc-exp" placeholder="MM/YY" required />
+            </div>
+            <div>
+              <label for="cvc">CVC</label>
+              <input id="cvc" name="cvc" autocomplete="cc-csc" inputmode="numeric" maxlength="4" required />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Order</legend>
+          <div class="line-item">
+            <span>Wireless Ticket (₹1200)</span>
+            <span class="value" data-unit="1200">₹1200</span>
+          </div>
+          <label for="qty">Qty</label>
+          <input id="qty" name="qty" type="number" min="1" value="1" max="9" />
+          <div class="line-item total" aria-live="polite">
+            <span>Total</span>
+            <span id="total">₹1200</span>
+          </div>
+        </fieldset>
+
+        <label for="note">Billing notes (optional)</label>
+        <textarea id="note" rows="2" placeholder="Apartment or access code"></textarea>
+
+        <button type="submit" class="primary">Pay now</button>
+      </form>
+
+      <output id="checkout-status" aria-live="polite"></output>
+    </section>
+  </main>
+
+  <script>
+    const qty = document.getElementById('qty');
+    const total = document.getElementById('total');
+    const form = document.getElementById('checkout-form');
+    const status = document.getElementById('checkout-status');
+
+    const unit = 1200;
+
+    function format(n) {
+      return `₹${n}`;
+    }
+
+    function refreshTotal() {
+      const value = Math.max(1, Number(qty.value || 1));
+      total.textContent = format(value * unit);
+      status.textContent = '';
+    }
+
+    qty.addEventListener('input', refreshTotal);
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const card = document.getElementById('card').value.replace(/\s+/g, '');
+      const expiry = document.getElementById('expiry').value;
+      const cvc = document.getElementById('cvc').value;
+      const name = document.getElementById('name').value.trim();
+
+      const expiryOk = /^\d{2}\/\d{2}$/.test(expiry);
+      const cvcOk = /^\d{3,4}$/.test(cvc);
+
+      if (!name || card.length < 12 || !expiryOk || !cvcOk) {
+        status.className = 'notice error';
+        status.textContent = 'Please use a valid card number, name, expiry (MM/YY), and CVC.';
+        return;
+      }
+
+      status.className = 'notice ok';
+      status.textContent = 'Payment preview accepted. This is a demo checkout flow.';
+      form.reset();
+      refreshTotal();
+    });
+
+    refreshTotal();
+  </script>
+</body>
+</html>
