@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 007 - Settings</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="settings-shell">
+    <h1>Settings</h1>
+    <p>System preferences with instant feedback and saved-state summary.</p>
+
+    <form id="settingsForm" aria-label="Settings form">
+      <section class="group">
+        <h2>Privacy</h2>
+        <label><input type="checkbox" name="analytics" /> Share usage analytics</label>
+        <label><input type="checkbox" name="ads" /> Personalized ads</label>
+      </section>
+
+      <section class="group">
+        <h2>Notifications</h2>
+        <label><input type="checkbox" name="email" /> Email notifications</label>
+        <label><input type="checkbox" name="push" /> Push notifications</label>
+      </section>
+
+      <section class="group">
+        <h2>Appearance</h2>
+        <label for="density">Display density</label>
+        <select id="density" name="density">
+          <option value="comfortable">Comfortable</option>
+          <option value="compact">Compact</option>
+          <option value="spacious">Spacious</option>
+        </select>
+      </section>
+
+      <button type="submit">Save settings</button>
+    </form>
+
+    <p id="snapshot" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const form = document.getElementById('settingsForm');
+    const snapshot = document.getElementById('snapshot');
+
+    function collectState() {
+      const data = new FormData(form);
+      const result = {
+        analytics: data.get('analytics') === 'on',
+        ads: data.get('ads') === 'on',
+        email: data.get('email') === 'on',
+        push: data.get('push') === 'on',
+        density: form.elements.density.value,
+      };
+      snapshot.textContent = `Saved settings: ${JSON.stringify(result)}`;
+    }
+
+    form.addEventListener('change', collectState);
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      collectState();
+    });
+
+    collectState();
+  </script>
+</body>
+</html>
