@@ -3,26 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Day 002 - Credit Card Checkout</title>
+  <title>Day 002 - Razor-Inspired Checkout</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="checkout-shell">
-    <section class="checkout-panel" aria-labelledby="checkout-title">
-      <h1 id="checkout-title">Card Checkout</h1>
-      <p>Secure, touch-friendly layout for entering card details and validating amounts.</p>
+  <main class="checkout-shell" aria-labelledby="checkout-title">
+    <section class="gateway-card" aria-label="Payment gateway checkout card">
+      <p class="eyebrow">Razor-style checkout demo</p>
+      <h1 id="checkout-title">PulsePay Checkout</h1>
+      <p class="muted">
+        Single-screen gateway-style flow with method selection, live amount updates, and
+        explicit validation states. Not affiliated with any brand.
+      </p>
+      <div class="pill" role="note">This is a demo checkout UI</div>
 
       <form id="checkout-form" novalidate>
+        <fieldset class="order">
+          <legend>Order details</legend>
+          <div class="line-item">
+            <span>Battle Pass Pack</span>
+            <span class="value" data-unit="1200">₹1200</span>
+          </div>
+          <label for="qty">Qty</label>
+          <input id="qty" name="qty" type="number" min="1" max="9" value="1" />
+
+          <div class="line-item">
+            <span>Convenience fee</span>
+            <span id="fee">₹40</span>
+          </div>
+          <div class="line-item total" aria-live="polite">
+            <span>Total</span>
+            <strong id="total">₹1240</strong>
+          </div>
+        </fieldset>
+
         <fieldset>
-          <legend>Payment details</legend>
+          <legend>Contact</legend>
+          <label for="mobile">Mobile number</label>
+          <input id="mobile" name="mobile" type="tel" inputmode="numeric" minlength="10" maxlength="10" placeholder="9876543210" required />
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+        </fieldset>
+
+        <fieldset class="methods">
+          <legend>Payment method</legend>
+          <div class="method-group" role="radiogroup" aria-label="Choose a payment method">
+            <label class="chip">
+              <input type="radio" name="method" value="card" checked />
+              <span>Card</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="method" value="upi" />
+              <span>UPI</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="method" value="wallet" />
+              <span>Wallet</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset id="cardPanel" class="panel-section">
+          <legend>Card details</legend>
 
           <label for="card">Card number</label>
           <input id="card" name="card" inputmode="numeric" autocomplete="cc-number" maxlength="19" placeholder="4111 1111 1111 1111" required />
 
-          <label for="name">Cardholder</label>
-          <input id="name" name="name" autocomplete="cc-name" required placeholder="Jane Doe" />
+          <label for="name">Cardholder name</label>
+          <input id="name" name="name" autocomplete="cc-name" placeholder="Jane Doe" required />
 
-          <div class="inline-group">
+          <div class="grid-2">
             <div>
               <label for="expiry">Expiry</label>
               <input id="expiry" name="expiry" autocomplete="cc-exp" placeholder="MM/YY" required />
@@ -34,73 +85,207 @@
           </div>
         </fieldset>
 
-        <fieldset>
-          <legend>Order</legend>
-          <div class="line-item">
-            <span>Wireless Ticket (₹1200)</span>
-            <span class="value" data-unit="1200">₹1200</span>
-          </div>
-          <label for="qty">Qty</label>
-          <input id="qty" name="qty" type="number" min="1" value="1" max="9" />
-          <div class="line-item total" aria-live="polite">
-            <span>Total</span>
-            <span id="total">₹1200</span>
-          </div>
+        <fieldset id="upiPanel" class="panel-section" hidden>
+          <legend>UPI</legend>
+          <label for="vpa">UPI ID</label>
+          <input id="vpa" name="vpa" type="text" autocomplete="off" placeholder="name@bank" />
         </fieldset>
 
-        <label for="note">Billing notes (optional)</label>
-        <textarea id="note" rows="2" placeholder="Apartment or access code"></textarea>
+        <fieldset id="walletPanel" class="panel-section" hidden>
+          <legend>Wallet</legend>
+          <label for="walletId">Wallet ID</label>
+          <input id="walletId" name="walletId" type="text" placeholder="wallet@example" />
+        </fieldset>
 
-        <button type="submit" class="primary">Pay now</button>
+        <label class="agree">
+          <input id="saveCard" type="checkbox" />
+          <span>Save payment details for faster checkout</span>
+        </label>
+
+        <button type="submit" id="payBtn" class="primary">Pay ₹1,240</button>
       </form>
 
-      <output id="checkout-status" aria-live="polite"></output>
+      <output id="checkoutStatus" aria-live="polite" role="status"></output>
     </section>
   </main>
 
   <script>
-    const qty = document.getElementById('qty');
-    const total = document.getElementById('total');
     const form = document.getElementById('checkout-form');
-    const status = document.getElementById('checkout-status');
+    const qtyInput = document.getElementById('qty');
+    const totalOutput = document.getElementById('total');
+    const feeOutput = document.getElementById('fee');
+    const payBtn = document.getElementById('payBtn');
+    const status = document.getElementById('checkoutStatus');
+    const methodInputs = [...document.querySelectorAll('input[name="method"]')];
+    const cardPanel = document.getElementById('cardPanel');
+    const upiPanel = document.getElementById('upiPanel');
+    const walletPanel = document.getElementById('walletPanel');
+    const cardNumber = document.getElementById('card');
+    const expiry = document.getElementById('expiry');
+    const cvc = document.getElementById('cvc');
+    const vpa = document.getElementById('vpa');
+    const walletId = document.getElementById('walletId');
+    const mobile = document.getElementById('mobile');
+    const email = document.getElementById('email');
 
-    const unit = 1200;
+    const unitPrice = 1200;
 
-    function format(n) {
-      return `₹${n}`;
+    const cardFields = [document.getElementById('name'), cardNumber, expiry, cvc];
+    const upiFields = [vpa];
+    const walletFields = [walletId];
+
+    function formatCard(value) {
+      return value
+        .replace(/\s+/g, '')
+        .replace(/(\d{4})(?=\d)/g, '$1 ')
+        .trim();
     }
 
-    function refreshTotal() {
-      const value = Math.max(1, Number(qty.value || 1));
-      total.textContent = format(value * unit);
+    function formatExpiry(value) {
+      const numbers = value.replace(/\D/g, '').slice(0, 4);
+      if (numbers.length <= 2) return numbers;
+      return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    }
+
+    function luhnValid(card) {
+      const digits = card.replace(/\s/g, '');
+      let sum = 0;
+      let shouldDouble = false;
+      for (let i = digits.length - 1; i >= 0; i -= 1) {
+        let digit = Number.parseInt(digits[i], 10);
+        if (shouldDouble) {
+          digit *= 2;
+          if (digit > 9) digit -= 9;
+        }
+        sum += digit;
+        shouldDouble = !shouldDouble;
+      }
+      return sum > 0 && sum % 10 === 0;
+    }
+
+    function updateTotal() {
+      const qty = Math.max(1, Number(qtyInput.value || 1));
+      const subtotal = qty * unitPrice;
+      const fee = Math.max(35, Math.round(subtotal * 0.033));
+      const total = subtotal + fee;
+      feeOutput.textContent = `₹${fee}`;
+      totalOutput.textContent = `₹${total}`;
+      payBtn.textContent = `Pay ${totalOutput.textContent}`;
+    }
+
+    function activeMethod() {
+      const checked = methodInputs.find((input) => input.checked);
+      return checked ? checked.value : 'card';
+    }
+
+    function setFieldRequired(mode) {
+      cardFields.forEach((field) => field.removeAttribute('required'));
+      upiFields.forEach((field) => field.removeAttribute('required'));
+      walletFields.forEach((field) => field.removeAttribute('required'));
+
+      if (mode === 'card') {
+        cardFields.forEach((field) => field.setAttribute('required', 'required'));
+      } else if (mode === 'upi') {
+        upiFields.forEach((field) => field.setAttribute('required', 'required'));
+      } else {
+        walletFields.forEach((field) => field.setAttribute('required', 'required'));
+      }
+    }
+
+    function showPanel(mode) {
+      cardPanel.hidden = mode !== 'card';
+      upiPanel.hidden = mode !== 'upi';
+      walletPanel.hidden = mode !== 'wallet';
+      setFieldRequired(mode);
+      status.className = '';
       status.textContent = '';
     }
 
-    qty.addEventListener('input', refreshTotal);
+    function validateBasicContact() {
+      const mobileOk = /^\d{10}$/.test(mobile.value);
+      const emailOk = /.+@.+\..+/.test(email.value);
+      return mobileOk && emailOk;
+    }
+
+    function validateCardMode() {
+      const digits = cardNumber.value.replace(/\s/g, '');
+      const expiryOk = /^\d{2}\/\d{2}$/.test(expiry.value);
+      const cvcOk = /^\d{3,4}$/.test(cvc.value);
+      return digits.length >= 12 && luhnValid(digits) && expiryOk && cvcOk;
+    }
+
+    function validateUpiMode() {
+      return /^.+@.+$/.test(vpa.value.trim());
+    }
+
+    function validateWalletMode() {
+      return walletId.value.trim().length >= 3;
+    }
+
+    function validateAll() {
+      const mode = activeMethod();
+      const isContactValid = validateBasicContact();
+      if (!isContactValid) return false;
+
+      if (mode === 'card') return validateCardMode();
+      if (mode === 'upi') return validateUpiMode();
+      return validateWalletMode();
+    }
+
+    methodInputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        showPanel(input.value);
+        updateTotal();
+      });
+    });
+
+    qtyInput.addEventListener('input', updateTotal);
+    mobile.addEventListener('input', () => {
+      mobile.value = mobile.value.replace(/\D/g, '').slice(0, 10);
+    });
+
+    cardNumber.addEventListener('input', () => {
+      cardNumber.value = formatCard(cardNumber.value);
+    });
+    expiry.addEventListener('input', () => {
+      expiry.value = formatExpiry(expiry.value);
+    });
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      const card = document.getElementById('card').value.replace(/\s+/g, '');
-      const expiry = document.getElementById('expiry').value;
-      const cvc = document.getElementById('cvc').value;
-      const name = document.getElementById('name').value.trim();
+      status.className = '';
 
-      const expiryOk = /^\d{2}\/\d{2}$/.test(expiry);
-      const cvcOk = /^\d{3,4}$/.test(cvc);
-
-      if (!name || card.length < 12 || !expiryOk || !cvcOk) {
-        status.className = 'notice error';
-        status.textContent = 'Please use a valid card number, name, expiry (MM/YY), and CVC.';
+      if (!validateBasicContact()) {
+        status.className = 'status error';
+        status.textContent = 'Use a valid 10-digit mobile number and email address.';
         return;
       }
 
-      status.className = 'notice ok';
-      status.textContent = 'Payment preview accepted. This is a demo checkout flow.';
+      if (!validateAll()) {
+        status.className = 'status error';
+        status.textContent = 'Please correct the payment details for the selected method.';
+        return;
+      }
+
+      if (form.reportValidity() === false) {
+        status.className = 'status error';
+        status.textContent = 'Some required fields are missing or not formatted correctly.';
+        return;
+      }
+
+      status.className = 'status ok';
+      status.textContent = `Demo payment accepted for ${totalOutput.textContent}. Transaction reference: TXN-${Date.now().toString().slice(-6)}`;
       form.reset();
-      refreshTotal();
+      qtyInput.value = 1;
+      updateTotal();
+      showPanel('card');
+      methodInputs[0].checked = true;
     });
 
-    refreshTotal();
+    const firstCardMode = methodInputs.find((input) => input.value === 'card');
+    firstCardMode.checked = true;
+    showPanel('card');
+    updateTotal();
   </script>
 </body>
 </html>
