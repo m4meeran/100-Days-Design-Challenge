@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 011 - Flash Message</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="flash-shell">
+    <h1>Flash Message</h1>
+    <p>Trigger and dismiss context-specific feedback messages.</p>
+
+    <div class="actions" role="group" aria-label="Flash controls">
+      <button id="success">Show success</button>
+      <button id="error">Show error</button>
+    </div>
+
+    <section id="toastArea" aria-live="polite" aria-atomic="true"></section>
+  </main>
+
+  <script>
+    const area = document.getElementById('toastArea');
+
+    function showFlash(type, message) {
+      const flash = document.createElement('div');
+      flash.className = `toast ${type}`;
+      flash.textContent = message;
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.textContent = 'Dismiss';
+      close.addEventListener('click', () => flash.remove());
+      flash.append(close);
+      area.append(flash);
+      clearTimeout(flash.timer);
+      flash.timer = setTimeout(() => flash.remove(), 4200);
+    }
+
+    document.getElementById('success').addEventListener('click', () => {
+      showFlash('ok', 'Profile saved successfully.');
+    });
+
+    document.getElementById('error').addEventListener('click', () => {
+      showFlash('bad', 'Upload failed. Please retry with a supported file format.');
+    });
+  </script>
+</body>
+</html>
