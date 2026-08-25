@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 009 - Music Player</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="player-shell">
+    <section class="player-card" aria-labelledby="music-title">
+      <h1 id="music-title">Music Player</h1>
+      <p>A compact responsive player with playlist and transport controls.</p>
+
+      <div class="cover" role="img" aria-label="Album cover placeholder">
+        <span>♫</span>
+      </div>
+
+      <div class="meta">
+        <p id="trackTitle">Moonlit Drive</p>
+        <p id="artist">Nova Beat</p>
+      </div>
+
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="progressBar"></span>
+      </div>
+
+      <div class="controls" aria-label="Playback controls">
+        <button type="button" id="prev" aria-label="Previous track">◁</button>
+        <button type="button" id="play" aria-label="Play or pause">▶</button>
+        <button type="button" id="next" aria-label="Next track">▷</button>
+      </div>
+
+      <p id="nowPlaying" role="status" aria-live="polite"></p>
+
+      <ul id="playlist" aria-label="Playlist">
+        <li data-title="Moonlit Drive" data-artist="Nova Beat">Moonlit Drive — Nova Beat</li>
+        <li data-title="City in Bloom" data-artist="Luma">City in Bloom — Luma</li>
+        <li data-title="Deep Static" data-artist="Aster">Deep Static — Aster</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const tracks = Array.from(document.querySelectorAll('#playlist li')).map((li) => ({
+      title: li.dataset.title,
+      artist: li.dataset.artist,
+    }));
+    const title = document.getElementById('trackTitle');
+    const artist = document.getElementById('artist');
+    const nowPlaying = document.getElementById('nowPlaying');
+    const progressBar = document.getElementById('progressBar');
+    const playButton = document.getElementById('play');
+    let index = 0;
+    let timer = null;
+    let progress = 0;
+    let playing = false;
+
+    function setTrack(i) {
+      index = (i + tracks.length) % tracks.length;
+      const t = tracks[index];
+      title.textContent = t.title;
+      artist.textContent = t.artist;
+      nowPlaying.textContent = `Loaded ${t.title} by ${t.artist}`;
+      progress = 0;
+      progressBar.style.width = '0%';
+    }
+
+    function updateProgress() {
+      progress += 2;
+      if (progress > 100) {
+        progress = 0;
+      }
+      progressBar.style.width = `${progress}%`;
+      progressBar.parentElement.setAttribute('aria-valuenow', String(progress));
+    }
+
+    playButton.addEventListener('click', () => {
+      if (playing) {
+        clearInterval(timer);
+        timer = null;
+        playing = false;
+        playButton.textContent = '▶';
+        nowPlaying.textContent = 'Paused';
+        return;
+      }
+
+      playing = true;
+      playButton.textContent = '⏸';
+      nowPlaying.textContent = `Playing ${title.textContent} by ${artist.textContent}`;
+      timer = setInterval(updateProgress, 120);
+    });
+
+    document.getElementById('next').addEventListener('click', () => setTrack(index + 1));
+    document.getElementById('prev').addEventListener('click', () => setTrack(index - 1));
+
+    setTrack(index);
+  </script>
+</body>
+</html>
