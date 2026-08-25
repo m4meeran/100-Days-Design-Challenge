@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 010 - Social Share</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="share-shell">
+    <article class="share-card">
+      <h1>Share this design tip</h1>
+      <p>Bring this article to your circle with one-click social actions.</p>
+      <div class="article">
+        <h2>Responsive composition makes UI feel effortless</h2>
+        <p>Learn 5 practical rules to keep spacing, type, and contrast stable across breakpoints.</p>
+      </div>
+      <div class="actions" aria-label="Share actions">
+        <button class="btn x" type="button" data-target="X">X</button>
+        <button class="btn in" type="button" data-target="LinkedIn">LinkedIn</button>
+        <button class="btn wa" type="button" data-target="WhatsApp">WhatsApp</button>
+      </div>
+      <p id="shareOutput" role="status" aria-live="polite"></p>
+    </article>
+  </main>
+
+  <script>
+    const output = document.getElementById('shareOutput');
+    for (const button of document.querySelectorAll('.actions button')) {
+      button.addEventListener('click', () => {
+        output.textContent = `Prepared share payload for ${button.dataset.target}.`;
+      });
+    }
+  </script>
+</body>
+</html>
