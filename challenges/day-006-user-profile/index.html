@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 006 - User Profile</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="profile-shell">
+    <article class="profile-card" aria-labelledby="profile-title">
+      <header>
+        <h1 id="profile-title">User Profile</h1>
+        <p>Account overview with accessible section switching.</p>
+      </header>
+
+      <section class="hero">
+        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80" alt="Profile avatar placeholder of a user"/>
+        <div>
+          <h2>Alex Mercer</h2>
+          <p>Senior Product Designer · San Francisco</p>
+          <p class="tagline">Building inclusive workflows since 2018.</p>
+        </div>
+      </section>
+
+      <nav aria-label="Profile sections">
+        <button class="tab" type="button" data-tab="overview" aria-controls="tab-overview" aria-selected="true">Overview</button>
+        <button class="tab" type="button" data-tab="activity" aria-controls="tab-activity" aria-selected="false">Activity</button>
+        <button class="tab" type="button" data-tab="privacy" aria-controls="tab-privacy" aria-selected="false">Privacy</button>
+      </nav>
+
+      <section id="tab-overview" class="panel" role="region">
+        <h3>Overview</h3>
+        <p>Last login: Today, 9:12 AM</p>
+        <p>Plan: Pro • Status: Active</p>
+      </section>
+      <section id="tab-activity" class="panel hidden" role="region">
+        <h3>Recent activity</h3>
+        <ul>
+          <li>Updated portfolio cover image</li>
+          <li>Joined 2 collaborative projects</li>
+          <li>Added 1-factor auth and biometric backup</li>
+        </ul>
+      </section>
+      <section id="tab-privacy" class="panel hidden" role="region">
+        <h3>Privacy</h3>
+        <p>Email visibility: On</p>
+        <p>Profile indexable by search: Off</p>
+      </section>
+
+      <p id="panelStatus" class="status" aria-live="polite"></p>
+    </article>
+  </main>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const panels = {
+      overview: document.getElementById('tab-overview'),
+      activity: document.getElementById('tab-activity'),
+      privacy: document.getElementById('tab-privacy')
+    };
+    const status = document.getElementById('panelStatus');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.setAttribute('aria-selected', 'false'));
+        Object.values(panels).forEach(panel => panel.classList.add('hidden'));
+        const selected = tab.dataset.tab;
+        tab.setAttribute('aria-selected', 'true');
+        panels[selected].classList.remove('hidden');
+        status.textContent = `${selected[0].toUpperCase()}${selected.slice(1)} panel loaded`;
+      });
+    });
+
+    status.textContent = 'Overview loaded';
+  </script>
+</body>
+</html>
