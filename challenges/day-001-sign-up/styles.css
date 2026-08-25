@@ -1,0 +1,143 @@
+* { box-sizing: border-box; }
+
+:root {
+  color-scheme: light;
+  --bg: #0f1226;
+  --panel: #ffffff;
+  --text: #10131f;
+  --muted: #5e6378;
+  --brand: #5b56f5;
+  --brand-2: #2cb3ff;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #f7f8ff 0%, #dce1ff 35%, #f7f9ff 100%);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.signup-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 1.25rem;
+}
+
+.panel {
+  width: min(540px, 100%);
+  background: var(--panel);
+  border-radius: 20px;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.16);
+  padding: 2rem;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+}
+
+p {
+  margin-top: 0;
+  color: var(--muted);
+}
+
+form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid #c8cee8;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.password-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.password-row input {
+  flex: 1;
+}
+
+.password-row button {
+  width: 84px;
+  border: 1px solid #c8cee8;
+  border-radius: 10px;
+  background: #f6f8ff;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.primary {
+  border: 0;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+  color: white;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  margin-top: 0.3rem;
+}
+
+.progress {
+  height: 10px;
+  border-radius: 999px;
+  background: #ebecff;
+  overflow: hidden;
+}
+
+#strengthBar {
+  display: block;
+  width: 0;
+  height: 100%;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.status {
+  margin-top: 0.8rem;
+  min-height: 1.3rem;
+  border-radius: 8px;
+  padding: 0.55rem;
+}
+
+.error {
+  background: #fff2f0;
+  color: #a61d24;
+}
+
+.success {
+  background: #f0fff4;
+  color: #0f7a3a;
+}
+
+button {
+  cursor: pointer;
+}
+
+@media (max-width: 520px) {
+  .panel {
+    border-radius: 14px;
+    padding: 1.3rem;
+  }
+}

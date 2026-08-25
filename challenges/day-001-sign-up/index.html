@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 001 - Sign Up</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="signup-shell">
+    <section class="panel" aria-labelledby="signup-title">
+      <div class="badge">Daily UI · Day 001</div>
+      <h1 id="signup-title">Sign Up Flow</h1>
+      <p>
+        Design a sign up page, modal, form, or app screen related to signing up
+        for something. This is a responsive and keyboard-friendly sign up screen.
+      </p>
+
+      <form id="signupForm" novalidate>
+        <label for="name">Full name</label>
+        <input id="name" name="name" type="text" autocomplete="name" required placeholder="Alex Rivera" />
+
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+
+        <label for="password">Password</label>
+        <div class="password-row">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            minlength="8"
+            autocomplete="new-password"
+            required
+            placeholder="at least 8 characters"
+          />
+          <button type="button" id="togglePassword" aria-controls="password" aria-pressed="false">
+            Show
+          </button>
+        </div>
+
+        <div class="progress" role="progressbar" aria-label="Password strength" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="strengthBar"></span>
+        </div>
+
+        <button type="submit" class="primary">Create account</button>
+      </form>
+
+      <div id="signupStatus" class="status" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('signupForm');
+    const status = document.getElementById('signupStatus');
+    const password = document.getElementById('password');
+    const toggle = document.getElementById('togglePassword');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthWrap = document.querySelector('[role="progressbar"]');
+
+    function scorePassword(value) {
+      let score = 0;
+      if (value.length >= 8) score += 30;
+      if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score += 25;
+      if (/\d/.test(value)) score += 20;
+      if (/[^A-Za-z0-9]/.test(value)) score += 25;
+      return Math.min(score, 100);
+    }
+
+    password.addEventListener('input', () => {
+      const strength = scorePassword(password.value);
+      strengthBar.style.width = `${strength}%`;
+      strengthWrap.setAttribute('aria-valuenow', String(strength));
+      strengthBar.style.background = strength < 35 ? '#ffb4a9' : strength < 65 ? '#ffd166' : '#9be15d';
+    });
+
+    toggle.addEventListener('click', () => {
+      const shown = password.type === 'text';
+      password.type = shown ? 'password' : 'text';
+      toggle.textContent = shown ? 'Show' : 'Hide';
+      toggle.setAttribute('aria-pressed', String(!shown));
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const name = document.getElementById('name').value.trim();
+      const pwd = password.value;
+
+      const validEmail = /.+@.+\..+/.test(email);
+      if (!name || !validEmail || pwd.length < 8) {
+        status.className = 'status error';
+        status.textContent = 'Please complete the form: name, valid email, and password (8+ chars).';
+        return;
+      }
+
+      status.className = 'status success';
+      status.textContent = `Welcome, ${name}. Registration demo validated successfully.`;
+      form.reset();
+      strengthBar.style.width = '0%';
+      strengthWrap.setAttribute('aria-valuenow', '0');
+    });
+  </script>
+</body>
+</html>
