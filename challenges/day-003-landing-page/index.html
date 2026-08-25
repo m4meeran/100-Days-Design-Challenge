@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 003 - Landing Page</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero" aria-labelledby="hero-title">
+    <nav>
+      <span class="brand">NovaBook</span>
+      <button class="menu" aria-label="Open menu">Menu</button>
+    </nav>
+    <div class="hero-body">
+      <p class="kicker">Daily UI · Day 003</p>
+      <h1 id="hero-title">Design your next creative landing page</h1>
+      <p>
+        This page highlights a launch campaign with concise blocks, strong visual
+        hierarchy, and clear action path.
+      </p>
+      <a href="#features" class="button">See product highlights</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="features" class="features" aria-label="Feature highlights">
+      <article class="card">
+        <h2>Landing in 3 steps</h2>
+        <ol>
+          <li>Discover what matters most</li>
+          <li>Watch a micro walkthrough</li>
+          <li>Join the first 1,000 users</li>
+        </ol>
+      </article>
+      <article class="card">
+        <h2>What you get</h2>
+        <ul>
+          <li>Curated templates</li>
+          <li>Real-time collaboration</li>
+          <li>Accessible components</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Need more proof?</h2>
+        <p>Trusted by design teams shipping in teams and solo studios.</p>
+        <button id="toggleTestimonial" class="button ghost" type="button">Show testimonial</button>
+        <blockquote id="testimonial" hidden>
+          "NovaBook helped our sign-up flow improve conversions by 28%."
+        </blockquote>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const button = document.getElementById('toggleTestimonial');
+    const quote = document.getElementById('testimonial');
+
+    button.addEventListener('click', () => {
+      const hidden = quote.hidden;
+      quote.hidden = !hidden;
+      button.textContent = hidden ? 'Hide testimonial' : 'Show testimonial';
+      button.setAttribute('aria-expanded', String(!hidden));
+    });
+  </script>
+</body>
+</html>
