@@ -1,0 +1,293 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0b1020;
+  --surface: #121933;
+  --surface-soft: #1a2342;
+  --text: #e8ecff;
+  --muted: #a6b0dd;
+  --accent: #6d8bff;
+  --accent-2: #9c9eff;
+  --line: #26315f;
+  --good: #4ade80;
+  --danger: #f97316;
+  --focus: #93c5fd;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background:
+    radial-gradient(circle at 15% -20%, rgba(109, 139, 255, 0.32), transparent 48%),
+    radial-gradient(circle at 85% 130%, rgba(156, 158, 255, 0.24), transparent 48%),
+    var(--bg);
+  color: var(--text);
+}
+
+.timer-app {
+  width: min(980px, 94vw);
+  margin: 1.8rem auto;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 1rem;
+}
+
+.hero,
+.setup-panel,
+.display-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+}
+
+.hero {
+  display: grid;
+  gap: 0.6rem;
+  grid-column: 1 / -1;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--accent-2);
+  margin: 0;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 2vw, 2rem);
+}
+
+h2 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.setup-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+input,
+input::-webkit-datetime-edit,
+input::-webkit-datetime-edit-fields-wrapper,
+input::-webkit-datetime-edit-text,
+input::-webkit-datetime-edit-minute-field,
+input::-webkit-datetime-edit-second-field,
+input::-webkit-datetime-edit-ampm-field {
+  color: var(--text);
+}
+
+input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--text);
+  font: inherit;
+  padding: 0.65rem 0.8rem;
+}
+
+input::placeholder {
+  color: #8b93c2;
+}
+
+.field input {
+  min-height: 2.8rem;
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.presets {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.presets legend {
+  width: 100%;
+  margin-bottom: 0.4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+button {
+  appearance: none;
+  border-radius: 12px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.preset,
+.actions button,
+.presets button {
+  border-color: transparent;
+  background: #222c57;
+  color: #ecf0ff;
+}
+
+#start-btn {
+  background: linear-gradient(125deg, #5f6dff, #8d6dff);
+  border-color: transparent;
+}
+
+button.secondary {
+  background: #202d5d;
+}
+
+button.ghost {
+  background: transparent;
+  color: #c7ceef;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.help-text {
+  color: var(--muted);
+  font-size: 0.9rem;
+  min-height: 1.1rem;
+}
+
+#error-message {
+  color: #ffb4a3;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.timer-card {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.event-label {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.pill {
+  margin: 0;
+  justify-self: start;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  background: #16214c;
+  border: 1px solid var(--line);
+  font-size: 0.83rem;
+  color: #dce2ff;
+}
+
+.time {
+  display: flex;
+  gap: 0.45rem;
+  justify-content: center;
+  align-items: baseline;
+  margin-top: 0.2rem;
+}
+
+.big {
+  font-size: clamp(1.9rem, 7vw, 2.8rem);
+  line-height: 1;
+  min-width: 2.75ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.progress-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+#progress {
+  width: 100%;
+  accent-color: var(--accent);
+  height: 0.6rem;
+}
+
+#progress-text {
+  color: #d4dbff;
+  font-weight: 600;
+  min-width: 3ch;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 860px) {
+  .timer-app {
+    grid-template-columns: 1fr;
+    margin: 1rem auto;
+    gap: 0.75rem;
+  }
+
+  .actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero,
+  .setup-panel,
+  .display-panel {
+    border-radius: 14px;
+  }
+}

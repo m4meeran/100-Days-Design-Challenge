@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 014 - Countdown Timer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="timer-app">
+      <header class="hero">
+        <p class="eyebrow">Daily UI</p>
+        <h1>Countdown Timer</h1>
+        <p>
+          Launch pads, cooktops, sports clocks, or your own focus block—set any event,
+          press play, and stay in control.
+        </p>
+      </header>
+
+      <section class="setup-panel" aria-labelledby="setup-heading">
+        <h2 id="setup-heading">Timer setup</h2>
+        <form id="timer-form" class="setup-grid" novalidate>
+          <div class="field">
+            <label for="event-name">Event name</label>
+            <input
+              id="event-name"
+              name="event-name"
+              type="text"
+              autocomplete="off"
+              maxlength="40"
+              placeholder="SpaceX launch, oven, sprint round"
+              value="Launch sequence"
+            />
+          </div>
+
+          <div class="field">
+            <label for="target-time">Target date &amp; time</label>
+            <input id="target-time" type="datetime-local" />
+          </div>
+
+          <fieldset class="presets" aria-label="Quick preset durations">
+            <legend>Quick presets</legend>
+            <button type="button" data-minutes="5">+5 min</button>
+            <button type="button" data-minutes="10">+10 min</button>
+            <button type="button" data-minutes="20">+20 min</button>
+            <button type="button" data-minutes="30">+30 min</button>
+          </fieldset>
+
+          <div class="actions" role="group" aria-label="Timer controls">
+            <button id="start-btn" type="submit">Start</button>
+            <button id="pause-btn" type="button" class="secondary" disabled>Pause</button>
+            <button id="resume-btn" type="button" class="secondary" disabled>Resume</button>
+            <button id="reset-btn" type="button" class="ghost" disabled>Reset</button>
+          </div>
+        </form>
+
+        <p id="error-message" class="help-text" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="display-panel" aria-labelledby="timer-heading" aria-live="polite">
+        <h2 id="timer-heading">Current countdown</h2>
+
+        <div class="timer-card">
+          <p id="event-label" class="event-label">Launch sequence</p>
+          <p id="status-pill" class="pill" aria-live="assertive">Idle</p>
+
+          <div class="time" aria-label="Time remaining" aria-live="off">
+            <span id="hh" class="big">00</span>:
+            <span id="mm" class="big">00</span>:
+            <span id="ss" class="big">00</span>
+          </div>
+          <p id="time-caption" class="help-text">Set a target time and start the countdown.</p>
+
+          <div class="progress-wrap" aria-label="Countdown progress" role="img" aria-hidden="true">
+            <span>Progress</span>
+            <progress id="progress" value="0" max="100"></progress>
+            <span id="progress-text">0%</span>
+          </div>
+
+          <p id="announce" class="sr-only" role="status" aria-live="assertive"></p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById('timer-form');
+      const eventNameInput = document.getElementById('event-name');
+      const targetTimeInput = document.getElementById('target-time');
+      const startBtn = document.getElementById('start-btn');
+      const pauseBtn = document.getElementById('pause-btn');
+      const resumeBtn = document.getElementById('resume-btn');
+      const resetBtn = document.getElementById('reset-btn');
+      const errorMessage = document.getElementById('error-message');
+      const eventLabel = document.getElementById('event-label');
+      const statusPill = document.getElementById('status-pill');
+      const hEl = document.getElementById('hh');
+      const mEl = document.getElementById('mm');
+      const sEl = document.getElementById('ss');
+      const timeCaption = document.getElementById('time-caption');
+      const progressEl = document.getElementById('progress');
+      const progressText = document.getElementById('progress-text');
+      const announce = document.getElementById('announce');
+      const presetButtons = document.querySelectorAll('.presets button');
+
+      const state = {
+        running: false,
+        paused: false,
+        intervalId: null,
+        totalMs: 0,
+        remainingMs: 0,
+        endAt: 0,
+        status: 'idle',
+      };
+
+      function nowIsoLocal() {
+        const now = new Date();
+        const tzOffset = now.getTimezoneOffset();
+        const local = new Date(now.getTime() - tzOffset * 60 * 1000);
+        return local.toISOString().slice(0, 16);
+      }
+
+      function formatField(value, digits = 2) {
+        return String(value).padStart(digits, '0');
+      }
+
+      function setDefaultTarget() {
+        if (!targetTimeInput.value) {
+          targetTimeInput.value = nowIsoLocal();
+        }
+      }
+
+      function tick() {
+        const now = Date.now();
+        const remaining = state.endAt - now;
+        state.remainingMs = Math.max(0, remaining);
+
+        if (state.remainingMs <= 0) {
+          completeTimer();
+          return;
+        }
+
+        updateTimerDisplay(state.remainingMs);
+        updateProgress();
+      }
+
+      function setStateButtons() {
+        if (!state.running && state.status === 'idle') {
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          resumeBtn.disabled = true;
+          resetBtn.disabled = true;
+          return;
+        }
+
+        if (state.running) {
+          startBtn.disabled = true;
+          pauseBtn.disabled = false;
+          resumeBtn.disabled = true;
+          resetBtn.disabled = false;
+          return;
+        }
+
+        if (state.paused) {
+          startBtn.disabled = true;
+          pauseBtn.disabled = true;
+          resumeBtn.disabled = false;
+          resetBtn.disabled = false;
+          return;
+        }
+      }
+
+      function setStatus(text) {
+        statusPill.textContent = text;
+        state.status = text.toLowerCase();
+        state.paused = text === 'Paused';
+      }
+
+      function updateTimerDisplay(ms) {
+        const totalSec = Math.max(0, Math.floor(ms / 1000));
+        const hrs = Math.floor(totalSec / 3600);
+        const mins = Math.floor((totalSec % 3600) / 60);
+        const secs = totalSec % 60;
+
+        hEl.textContent = formatField(hrs);
+        mEl.textContent = formatField(mins);
+        sEl.textContent = formatField(secs);
+
+        if (state.status === 'complete') {
+          timeCaption.textContent = `${eventLabel.textContent} is complete.`;
+          return;
+        }
+
+        if (state.running) {
+          timeCaption.textContent = `${eventLabel.textContent} is running.`;
+          return;
+        }
+
+        if (state.paused) {
+          timeCaption.textContent = `${eventLabel.textContent} paused at ${hEl.textContent}:${mEl.textContent}:${sEl.textContent}.`;
+          return;
+        }
+
+        timeCaption.textContent = `${eventLabel.textContent} is ready.`;
+      }
+
+      function updateProgress() {
+        if (!state.totalMs) {
+          progressEl.value = 0;
+          progressText.textContent = '0%';
+          return;
+        }
+
+        const done = Math.min(1, Math.max(0, 1 - state.remainingMs / state.totalMs));
+        const pct = Math.round(done * 100);
+        progressEl.value = pct;
+        progressText.textContent = `${pct}%`;
+      }
+
+      function clearTimerLoop() {
+        if (state.intervalId) {
+          clearInterval(state.intervalId);
+          state.intervalId = null;
+        }
+      }
+
+      function startTimer(event) {
+        event.preventDefault();
+        errorMessage.textContent = '';
+        announce.textContent = '';
+
+        const eventName = eventNameInput.value.trim() || 'Countdown event';
+        eventLabel.textContent = eventName;
+
+        if (!targetTimeInput.value) {
+          errorMessage.textContent = 'Please set a target date and time.';
+          targetTimeInput.focus();
+          return;
+        }
+
+        const target = new Date(targetTimeInput.value).getTime();
+        const now = Date.now();
+        const total = target - now;
+
+        if (!Number.isFinite(total) || total <= 0) {
+          errorMessage.textContent = 'Please choose a future date and time.';
+          targetTimeInput.focus();
+          return;
+        }
+
+        state.totalMs = total;
+        state.remainingMs = total;
+        state.endAt = now + total;
+        state.running = true;
+        state.paused = false;
+
+        setStatus('Running');
+        setStateButtons();
+        updateProgress();
+        startBtn.textContent = 'Restart';
+
+        clearTimerLoop();
+        tick();
+        state.intervalId = setInterval(tick, 1000);
+        announce.textContent = `${eventLabel.textContent} started. ${Math.round(total / 1000)} seconds to go.`;
+      }
+
+      function pauseTimer() {
+        if (!state.running || state.paused) {
+          return;
+        }
+
+        clearTimerLoop();
+        const remaining = state.endAt - Date.now();
+        state.remainingMs = Math.max(0, remaining);
+        state.running = false;
+        setStatus('Paused');
+        setStateButtons();
+        updateTimerDisplay(state.remainingMs);
+        updateProgress();
+        announce.textContent = `${eventLabel.textContent} paused at ${hEl.textContent}:${mEl.textContent}:${sEl.textContent}.`;
+      }
+
+      function resumeTimer() {
+        if (!state.paused) {
+          return;
+        }
+
+        state.running = true;
+        state.paused = false;
+        state.endAt = Date.now() + state.remainingMs;
+
+        setStatus('Running');
+        setStateButtons();
+        clearTimerLoop();
+        tick();
+        state.intervalId = setInterval(tick, 1000);
+        announce.textContent = `${eventLabel.textContent} resumed.`;
+      }
+
+      function resetTimer() {
+        clearTimerLoop();
+
+        state.running = false;
+        state.paused = false;
+        state.totalMs = 0;
+        state.remainingMs = 0;
+        state.endAt = 0;
+        state.status = 'idle';
+
+        setStatus('Idle');
+        hEl.textContent = '00';
+        mEl.textContent = '00';
+        sEl.textContent = '00';
+        progressEl.value = 0;
+        progressText.textContent = '0%';
+        startBtn.textContent = 'Start';
+        setStateButtons();
+        eventLabel.textContent = eventNameInput.value.trim() || 'Countdown event';
+        timeCaption.textContent = 'Set a target time and start the countdown.';
+        announce.textContent = `${eventLabel.textContent} reset.`;
+        errorMessage.textContent = '';
+      }
+
+      function completeTimer() {
+        clearTimerLoop();
+
+        state.running = false;
+        state.paused = false;
+        state.remainingMs = 0;
+
+        setStatus('Complete');
+        setStateButtons();
+        updateTimerDisplay(0);
+        updateProgress();
+        startBtn.textContent = 'Restart';
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = true;
+        resetBtn.disabled = false;
+
+        announce.textContent = `${eventLabel.textContent} complete! Time's up.`;
+      }
+
+      function setTargetFromMinutes(minutes) {
+        const when = new Date(Date.now() + minutes * 60 * 1000);
+        targetTimeInput.value = new Date(when - when.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      }
+
+      presetButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const minutes = Number(button.dataset.minutes);
+          if (Number.isNaN(minutes)) {
+            return;
+          }
+          setTargetFromMinutes(minutes);
+          const eventName = eventNameInput.value.trim();
+          errorMessage.textContent = eventName
+            ? `Preset selected: ${minutes} minutes for ${eventName}`
+            : `Preset selected: ${minutes} minutes`;
+          if (minutes >= 10) {
+            errorMessage.textContent += ' - good for a focused launch-like countdown.';
+          }
+        });
+      });
+
+      form.addEventListener('submit', startTimer);
+      pauseBtn.addEventListener('click', pauseTimer);
+      resumeBtn.addEventListener('click', resumeTimer);
+      resetBtn.addEventListener('click', resetTimer);
+      eventNameInput.addEventListener('input', () => {
+        eventLabel.textContent = eventNameInput.value.trim() || 'Countdown event';
+        if (state.status === 'complete' || !state.running) {
+          timeCaption.textContent = `${eventLabel.textContent} is ready.`;
+        }
+      });
+
+      setDefaultTarget();
+      setStateButtons();
+      setStatus('Idle');
+      updateTimerDisplay(0);
+      statusPill.textContent = 'Idle';
+    </script>
+  </body>
+</html>
