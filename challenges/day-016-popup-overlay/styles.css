@@ -1,0 +1,275 @@
+:root {
+  --bg: #060d18;
+  --bg-soft: #0f1c34;
+  --card: #fff;
+  --text: #121826;
+  --muted: #5b6476;
+  --line: #d6deeb;
+  --brand: #2f80ed;
+  --brand-dark: #2a6fd2;
+  --surface: #f7f9ff;
+  --focus: #ffb400;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% -10%, #1a2a54 0, #060d18 36%),
+    linear-gradient(160deg, #111d39, #0a1225);
+  color: #edf2ff;
+  min-height: 100%;
+}
+
+body {
+  padding: 2rem;
+  display: grid;
+  gap: 1.5rem;
+  place-items: center;
+  line-height: 1.5;
+}
+
+.masthead {
+  width: min(960px, 100%);
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  color: #aeb9de;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+.content {
+  width: min(960px, 100%);
+}
+
+.article-cta {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  border: 1px solid #213157;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-soft) 86%, #fff 14%);
+}
+
+.content article {
+  background: color-mix(in srgb, var(--bg-soft) 82%, #fff 18%);
+  border: 1px solid #213157;
+  border-radius: 20px;
+  padding: clamp(1rem, 3vw, 1.6rem);
+}
+
+.content h2 {
+  margin-bottom: 0.4rem;
+}
+
+.content p {
+  color: #c6d3f8;
+}
+
+button {
+  font: inherit;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  padding: 0.7rem 1.05rem;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+#open-overlay {
+  background: #fff;
+  color: #0d1a36;
+  font-weight: 700;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 50;
+}
+
+.overlay.is-open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 8, 20, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.overlay-card {
+  position: relative;
+  width: min(460px, calc(100vw - 2rem));
+  background: linear-gradient(180deg, #ffffff, #f7f9ff);
+  color: var(--text);
+  border-radius: 20px;
+  padding: 1.6rem;
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px rgba(4, 9, 26, 0.45);
+  display: grid;
+  gap: 0.8rem;
+  z-index: 1;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #edf1fb;
+  font-size: 1.2rem;
+  color: #2e3f67;
+}
+
+.chip {
+  margin: 0;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.2rem 0.72rem;
+  font-size: 0.75rem;
+  color: #3551a5;
+  background: #e9f0ff;
+  border: 1px solid #cae0ff;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.overlay-card h2 {
+  margin-bottom: 0.1rem;
+}
+
+.overlay-card p {
+  margin-bottom: 0.2rem;
+  color: #596a8d;
+}
+
+form {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+label {
+  font-weight: 650;
+  font-size: 0.94rem;
+}
+
+input[type='text'],
+input[type='email'] {
+  width: 100%;
+  border: 1px solid #c2cbdf;
+  border-radius: 12px;
+  padding: 0.66rem 0.8rem;
+  font: inherit;
+}
+
+input[type='text']:focus,
+input[type='email']:focus {
+  border-color: #2f80ed;
+}
+
+.inline-check {
+  display: flex;
+  align-items: start;
+  gap: 0.55rem;
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+
+.inline-check input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.15rem;
+}
+
+#submit-btn,
+.ghost-btn {
+  margin-top: 0.2rem;
+  width: 100%;
+  border: 0;
+  font-weight: 700;
+  color: white;
+}
+
+#submit-btn {
+  background: linear-gradient(180deg, #2f80ed, #2364c8);
+}
+
+#submit-btn:hover,
+#submit-btn:focus-visible {
+  background: linear-gradient(180deg, #3e8dff, #2868d4);
+}
+
+.ghost-btn {
+  background: transparent;
+  color: #2f80ed;
+  border: 1px solid #bfd0ff;
+}
+
+.note {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: #5b6d95;
+}
+
+#form-message {
+  min-height: 1.2rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+#form-message.error {
+  color: #b42318;
+}
+
+#form-message.success {
+  color: #0f7a37;
+}
+
+@media (max-width: 520px) {
+  body {
+    padding: 1rem;
+  }
+
+  .overlay-card {
+    width: min(430px, calc(100vw - 1.1rem));
+    padding: 1.2rem;
+  }
+
+  .article-cta {
+    margin-top: 1rem;
+  }
+}

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 016 - Popup Overlay</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <p class="eyebrow">Daily UI · Day 016</p>
+      <h1>CityPulse Newsletter & Membership Overlay</h1>
+      <p>
+        A responsive gated-CTA popup appears on top of long-form content and invites users to
+        unlock weekly local insights.
+      </p>
+    </header>
+
+    <main class="content" aria-label="Landing page content">
+      <article>
+        <h2>Morning Brief for Urban Explorers</h2>
+        <p>
+          Read curated transit updates, neighborhood events, and climate alerts before they hit your inbox.
+          Stay informed with short, high-signal summaries that help you move through your city efficiently.
+        </p>
+        <p>
+          This page includes a premium newsletter prompt overlay with multiple interaction states:
+          opening on load, open/close controls, form validation, and a focus-managed confirmation state.
+        </p>
+        <section class="article-cta">
+          <h3>Try the interaction</h3>
+          <p>
+            Click the button below to reopen the popup manually after closing it.
+          </p>
+          <button id="open-overlay" type="button">Open membership overlay</button>
+        </section>
+      </article>
+    </main>
+
+    <aside
+      id="overlay"
+      class="overlay"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="overlay-title"
+      aria-describedby="overlay-description"
+    >
+      <div class="overlay-backdrop" data-close-overlay="true" aria-hidden="true"></div>
+      <div class="overlay-card" role="document">
+        <button
+          id="close-overlay"
+          class="close-btn"
+          type="button"
+          aria-label="Close newsletter overlay"
+        >
+          ×
+        </button>
+
+        <p class="chip">Premium Access</p>
+        <h2 id="overlay-title">Unlock CityPulse Premium</h2>
+        <p id="overlay-description">
+          Get a free trial with city alerts, event calendars, and monthly planning templates.
+          No spam. Cancel anytime.
+        </p>
+
+        <form id="signup-form" novalidate>
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" placeholder="Alex Morgan" required />
+
+          <label for="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="alex@example.com"
+            required
+          />
+
+          <label class="inline-check" for="consent">
+            <input id="consent" name="consent" type="checkbox" required />
+            Send me personalized daily highlights and member-only updates.
+          </label>
+
+          <button id="submit-btn" type="submit">Continue to Premium</button>
+
+          <p class="note">Already a subscriber?</p>
+          <button id="close-inline" type="button" class="ghost-btn">Maybe later</button>
+          <p id="form-message" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </aside>
+
+    <script>
+      const overlay = document.getElementById('overlay');
+      const openBtn = document.getElementById('open-overlay');
+      const closeBtn = document.getElementById('close-overlay');
+      const closeInlineBtn = document.getElementById('close-inline');
+      const form = document.getElementById('signup-form');
+      const message = document.getElementById('form-message');
+      const emailInput = document.getElementById('email');
+      const nameInput = document.getElementById('name');
+      const consentInput = document.getElementById('consent');
+      const backdrop = overlay.querySelector('.overlay-backdrop');
+
+      const focusableSelectors = [
+        'button',
+        'input',
+        'textarea',
+        'select',
+        'a[href]',
+        '[tabindex]:not([tabindex="-1"])',
+      ];
+
+      let lastFocused = null;
+      let autoOpenTimeoutId = null;
+
+      function getFocusableElements() {
+        return Array.from(overlay.querySelectorAll(focusableSelectors.join(',')))
+          .filter((el) => !el.disabled && el.offsetParent !== null);
+      }
+
+      function openOverlay() {
+        if (autoOpenTimeoutId) {
+          clearTimeout(autoOpenTimeoutId);
+          autoOpenTimeoutId = null;
+        }
+
+        overlay.classList.add('is-open');
+        overlay.setAttribute('aria-hidden', 'false');
+        message.textContent = '';
+        nameInput.value = '';
+        emailInput.value = '';
+        consentInput.checked = false;
+        emailInput.setCustomValidity('');
+        form.classList.remove('was-validated');
+
+        lastFocused = document.activeElement;
+        window.requestAnimationFrame(() => {
+          const firstFocusable = closeBtn;
+          firstFocusable.focus();
+        });
+      }
+
+      function closeOverlay() {
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+        message.textContent = '';
+
+        if (lastFocused && typeof lastFocused.focus === 'function') {
+          lastFocused.focus();
+        }
+
+        autoOpenTimeoutId = setTimeout(() => {
+          openOverlay();
+        }, 22000);
+      }
+
+      function validateEmail(value) {
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+        return isValid;
+      }
+
+      function trapFocus(event) {
+        if (event.key !== 'Tab' || !overlay.classList.contains('is-open')) {
+          return;
+        }
+
+        const focusables = getFocusableElements();
+        if (!focusables.length) {
+          event.preventDefault();
+          return;
+        }
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const isShift = event.shiftKey;
+
+        if (isShift && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+          return;
+        }
+
+        if (!isShift && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+
+      function updateMessage(success, text) {
+        message.textContent = text;
+        message.classList.toggle('error', !success);
+        message.classList.toggle('success', success);
+      }
+
+      openBtn.addEventListener('click', openOverlay);
+      closeBtn.addEventListener('click', closeOverlay);
+      closeInlineBtn.addEventListener('click', closeOverlay);
+      backdrop.addEventListener('click', closeOverlay);
+
+      document.addEventListener('keydown', (event) => {
+        if (!overlay.classList.contains('is-open')) {
+          return;
+        }
+
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeOverlay();
+          return;
+        }
+
+        trapFocus(event);
+      });
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        form.classList.add('was-validated');
+
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const hasConsent = consentInput.checked;
+
+        if (!name) {
+          updateMessage(false, 'Please enter your full name.');
+          nameInput.focus();
+          return;
+        }
+
+        if (!validateEmail(email)) {
+          updateMessage(false, 'Enter a valid email address to continue.');
+          emailInput.focus();
+          return;
+        }
+
+        if (!hasConsent) {
+          updateMessage(false, 'Please confirm your preference to receive updates.');
+          consentInput.focus();
+          return;
+        }
+
+        updateMessage(true, `Welcome aboard, ${name}! Access to premium alerts is now unlocked.`);
+        submitCompleteState(true);
+      });
+
+      function submitCompleteState() {
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Done';
+
+        closeInlineBtn.style.display = 'none';
+        closeBtn.textContent = '✓';
+        closeBtn.setAttribute('aria-label', 'Continue to content');
+        closeBtn.onclick = () => {
+          closeOverlay();
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Continue to Premium';
+          closeInlineBtn.style.display = '';
+          closeBtn.textContent = '×';
+          closeBtn.setAttribute('aria-label', 'Close newsletter overlay');
+          closeBtn.onclick = closeOverlay;
+        };
+      }
+
+      overlay.setAttribute('aria-hidden', 'true');
+      autoOpenTimeoutId = setTimeout(() => {
+        openOverlay();
+      }, 1200);
+    </script>
+  </body>
+</html>
