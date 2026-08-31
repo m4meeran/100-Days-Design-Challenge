@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 017 - Purchase Receipt</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="receipt-page">
+      <section class="receipt-shell" aria-labelledby="receipt-title">
+        <header class="receipt-header">
+          <p class="badge">Daily UI Day 017</p>
+          <h1 id="receipt-title">Purchase Receipt</h1>
+          <p class="muted">Urban Goods Co. · Order Receipt</p>
+        </header>
+
+        <section class="merchant" aria-label="Merchant and order identity">
+          <div>
+            <h2>Urban Goods Co.</h2>
+            <p>
+              28 Cedar Lane, Floor 3<br />
+              Bengaluru, India 560001<br />
+              <a href="https://example.com" target="_blank" rel="noopener">www.urbangoods.example</a>
+            </p>
+          </div>
+          <div class="meta-card" aria-label="Order summary">
+            <p><span>Receipt #</span><strong id="receipt-number">RCP-UG-98M2-77</strong></p>
+            <p><span>Order #</span><strong>ORD-983412</strong></p>
+            <p><span>Tracking #</span><strong>TRK-77LZ-0045</strong></p>
+            <p><span>Source</span><strong>In-Store Mobile POS</strong></p>
+            <p><span>Purchase date</span><strong><time datetime="2026-08-31T11:32:00+05:30">31 Aug 2026, 11:32 AM IST</time></strong></p>
+          </div>
+        </section>
+
+        <section class="items" aria-labelledby="items-heading">
+          <h3 id="items-heading">Items</h3>
+          <div class="table-wrap" role="region" aria-label="Itemized purchase details">
+            <table>
+              <caption class="sr-only">Itemized list of purchased products</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Item</th>
+                  <th scope="col">Qty</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="item-name">AltoPro Wireless Keyboard</div>
+                    <p class="item-meta">SKU: UG-KB-210</p>
+                  </td>
+                  <td>1</td>
+                  <td>₹2,190.00</td>
+                  <td>₹2,190.00</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="item-name">SoftGrip Wrist Support</div>
+                    <p class="item-meta">SKU: UG-WR-118</p>
+                  </td>
+                  <td>2</td>
+                  <td>₹640.00</td>
+                  <td>₹1,280.00</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="item-name">USB-C Travel Adapter</div>
+                    <p class="item-meta">SKU: UG-AD-402</p>
+                  </td>
+                  <td>1</td>
+                  <td>₹1,050.00</td>
+                  <td>₹1,050.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="totals" aria-label="Amount breakdown">
+            <div><span>Subtotal</span><strong>₹4,520.00</strong></div>
+            <div><span>Tax (GST 18%)</span><strong>₹813.60</strong></div>
+            <div><span>Discount</span><strong>- ₹120.00</strong></div>
+            <div class="grand"><span>Total</span><strong>₹5,213.60</strong></div>
+          </div>
+        </section>
+
+        <section class="actions" aria-label="Receipt actions">
+          <button id="toggle-shipping" type="button" class="btn btn-primary" aria-expanded="false" aria-controls="shipping-panel">
+            Show Shipping Timeline
+          </button>
+          <button id="copy-receipt" type="button" class="btn btn-outline">Copy Receipt Number</button>
+          <a class="btn btn-ghost" href="#support">Contact Support</a>
+        </section>
+
+        <section id="shipping-panel" class="shipping" hidden aria-live="polite">
+          <h3>Shipping Progress</h3>
+          <ol>
+            <li><strong>Packed</strong> — 31 Aug 2026, 12:05 PM IST</li>
+            <li><strong>Shipped</strong> — 31 Aug 2026, 02:40 PM IST</li>
+            <li><strong>In Transit</strong> — 1 Sep 2026, 10:18 AM IST</li>
+            <li><strong>Out for Delivery</strong> — 1 Sep 2026, 08:00 AM IST</li>
+          </ol>
+        </section>
+
+        <section id="support" class="support" aria-labelledby="support-heading">
+          <h3 id="support-heading">Support & Vendor Information</h3>
+          <div class="support-grid">
+            <div>
+              <h4>Customer support</h4>
+              <p>Support hotline: <a href="tel:+911800234567">+91 1800 234 567</a></p>
+              <p>Email: <a href="mailto:support@urbangoods.example">support@urbangoods.example</a></p>
+              <p>Hours: Mon–Sat, 09:00–20:00 IST</p>
+            </div>
+            <div>
+              <h4>Vendor details</h4>
+              <p><strong>Vendor:</strong> Urban Goods Tech Retail</p>
+              <p><strong>Location:</strong> Bengaluru, India</p>
+              <p><strong>Website:</strong> <a href="https://example.com">urbangoods.example</a></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="notes" aria-live="polite" role="status">
+          <p id="copy-feedback" aria-hidden="true"></p>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const toggleBtn = document.getElementById('toggle-shipping');
+      const shippingPanel = document.getElementById('shipping-panel');
+      const copyBtn = document.getElementById('copy-receipt');
+      const feedback = document.getElementById('copy-feedback');
+      const receipt = document.getElementById('receipt-number').textContent;
+
+      toggleBtn.addEventListener('click', () => {
+        const isOpen = shippingPanel.hasAttribute('hidden');
+        if (isOpen) {
+          shippingPanel.removeAttribute('hidden');
+          toggleBtn.textContent = 'Hide Shipping Timeline';
+          toggleBtn.setAttribute('aria-expanded', 'true');
+        } else {
+          shippingPanel.setAttribute('hidden', '');
+          toggleBtn.textContent = 'Show Shipping Timeline';
+          toggleBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(receipt);
+          feedback.textContent = `Receipt ${receipt} copied to clipboard.`;
+        } catch {
+          feedback.textContent = 'Clipboard unavailable. Please copy the receipt number manually.';
+        }
+      });
+    </script>
+  </body>
+</html>
