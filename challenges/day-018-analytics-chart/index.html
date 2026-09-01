@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 018 • Analytics Chart</title>
+    <meta
+      name="description"
+      content="A responsive analytics dashboard for comparing website, app, and e-commerce traffic behavior across time ranges."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#dashboard">Skip to dashboard</a>
+
+    <header class="topbar">
+      <p class="eyebrow">Daily UI Day 018</p>
+      <h1>Analytics Performance Center</h1>
+      <p>
+        A concise dashboard for comparing traffic and conversion patterns across channels.
+      </p>
+    </header>
+
+    <main id="dashboard" class="dashboard">
+      <section class="panel controls" aria-labelledby="analytics-label">
+        <h2 id="analytics-label">Analytics chart</h2>
+        <p class="muted">
+          Use the controls to switch channels and reporting windows. The chart and
+          key metrics update instantly.
+        </p>
+
+        <div class="control-groups">
+          <fieldset class="control-group">
+            <legend id="dataset-legend">Channel</legend>
+            <div class="segmented" role="tablist" aria-labelledby="dataset-legend">
+              <button
+                type="button"
+                class="segment active"
+                data-channel="web"
+                aria-pressed="true"
+                aria-label="Show web analytics data"
+              >
+                Web
+              </button>
+              <button
+                type="button"
+                class="segment"
+                data-channel="app"
+                aria-pressed="false"
+                aria-label="Show mobile app analytics data"
+              >
+                App
+              </button>
+              <button
+                type="button"
+                class="segment"
+                data-channel="store"
+                aria-pressed="false"
+                aria-label="Show e-commerce analytics data"
+              >
+                Store
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset class="control-group">
+            <legend id="range-legend">Time range</legend>
+            <div class="segmented" role="tablist" aria-labelledby="range-legend">
+              <button
+                type="button"
+                class="segment active"
+                data-range="7"
+                aria-pressed="true"
+              >
+                7 days
+              </button>
+              <button
+                type="button"
+                class="segment"
+                data-range="30"
+                aria-pressed="false"
+              >
+                30 days
+              </button>
+              <button
+                type="button"
+                class="segment"
+                data-range="90"
+                aria-pressed="false"
+              >
+                90 days
+              </button>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="status" role="status" aria-live="polite">
+          Showing <strong id="status-scope">Web</strong> metrics for the last
+          <strong id="status-range">7 days</strong>.
+        </div>
+      </section>
+
+      <section class="panel metrics" aria-label="Key metrics">
+        <article class="metric-card">
+          <p class="metric-label">Users</p>
+          <p class="metric-value" id="metric-users">42,120</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Conversion rate</p>
+          <p class="metric-value" id="metric-conversion">4.6%</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Revenue</p>
+          <p class="metric-value" id="metric-revenue">$128,490</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Avg. session length</p>
+          <p class="metric-value" id="metric-session">4m 32s</p>
+        </article>
+      </section>
+
+      <section class="panel chart-panel" aria-labelledby="trend-title">
+        <header>
+          <h2 id="trend-title">Trend chart</h2>
+          <p class="muted" id="trend-caption">7-day trend by day of week</p>
+        </header>
+
+        <svg
+          class="trend-chart"
+          viewBox="0 0 600 220"
+          role="img"
+          aria-labelledby="trend-title trend-caption"
+          focusable="false"
+        >
+          <g class="grid" id="trend-grid"></g>
+          <g id="trend-axis"></g>
+          <path id="trend-line" d="" fill="none"></path>
+          <g id="trend-points"></g>
+        </svg>
+
+        <p class="muted note" id="trend-summary">Traffic is growing with a steady pace this period.</p>
+      </section>
+
+      <section class="panel chart-panel" aria-labelledby="source-title">
+        <header>
+          <h2 id="source-title">Traffic by source</h2>
+          <p class="muted">Share of users by acquisition source</p>
+        </header>
+
+        <div class="bars" id="source-bars" role="list"></div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
